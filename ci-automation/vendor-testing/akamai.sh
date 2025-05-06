@@ -12,16 +12,16 @@ source ci-automation/vendor_test.sh
 
 copy_from_buildcache "images/${CIA_ARCH}/${CIA_VERNUM}/${AKAMAI_IMAGE_NAME}" .
 
+kola_test_basename="ci-${CIA_VERNUM//[+.]/-}"
+
 # Upload the image on Akamai.
 IMAGE_ID=$(ore akamai \
   --akamai-token="${AKAMAI_TOKEN}" \
   --akamai-region="${AKAMAI_REGION}" \
   create-image \
-  --name flatcar-"${CIA_VERNUM}" \
+  --name "${kola_test_basename}" \
   --file="${AKAMAI_IMAGE_NAME}"
 )
-
-kola_test_basename="ci-${CIA_VERNUM//[+.]/-}"
 
 set -x
 
