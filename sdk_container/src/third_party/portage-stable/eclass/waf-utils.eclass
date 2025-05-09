@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: waf-utils.eclass
@@ -23,7 +23,7 @@ esac
 if [[ -z ${_WAF_UTILS_ECLASS} ]]; then
 _WAF_UTILS_ECLASS=1
 
-inherit multilib toolchain-funcs multiprocessing
+inherit multilib sysroot toolchain-funcs multiprocessing
 
 # @ECLASS_VARIABLE: WAF_VERBOSE
 # @USER_VARIABLE
@@ -79,7 +79,7 @@ waf-utils_src_configure() {
 
 	: "${WAF_BINARY:="${S}/waf"}"
 
-	local conf_args=()
+	local conf_args=() CMD=()
 
 	local waf_help=$("${WAF_BINARY}" --help 2>/dev/null)
 	if [[ ${waf_help} == *--docdir* ]]; then
@@ -95,9 +95,20 @@ waf-utils_src_configure() {
 		conf_args+=( --mandir="${EPREFIX}"/usr/share/man )
 	fi
 
+	# waf supports executing binaries via a wrapper for cross-compiling. This
+	# may already be handled by a QEMU outside this environment if binfmt_misc
+	# has been used with the F flag, and we cannot add a cross-only dependency
+	# on QEMU. For these reasons, set the prefix using QEMU_LD_PREFIX rather
+	# than QEMU's -L arg, and check whether QEMU is present before using it.
+	if tc-is-cross-compiler; then
+		CMD+=( QEMU_LD_PREFIX="${SYSROOT}" )
+		local qemu=$(type -P "qemu-$(qemu_arch)")
+		[[ -n ${qemu} ]] && conf_args+=( --cross-compile --cross-execute="${qemu}" )
+	fi
+
 	tc-export AR CC CPP CXX RANLIB
 
-	local CMD=(
+	CMD+=(
 		PYTHONHASHSEED=1
 		CCFLAGS="${CFLAGS}"
 		LINKFLAGS="${CFLAGS} ${LDFLAGS}"
