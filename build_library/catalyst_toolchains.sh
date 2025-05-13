@@ -33,6 +33,10 @@ build_target_toolchain() {
     cp -at "${ROOT}" "${SYSROOT}"/lib*
     cp -at "${ROOT}"/usr "${SYSROOT}"/usr/include "${SYSROOT}"/usr/lib*
 
+    local -a args_for_bdl=()
+    if [[ -n ${clst_VERBOSE} ]]; then
+        args_for_bdl+=(-v)
+    fi
     function btt_bdl_portageq() {
         ROOT=${ROOT} SYSROOT=${ROOT} PORTAGE_CONFIGROOT=${ROOT} portageq "${@}"
     }
@@ -49,7 +53,7 @@ build_target_toolchain() {
     BDL_PORTAGEQ=btt_bdl_portageq \
     BDL_EQUERY=btt_bdl_equery \
     BDL_EMERGE=btt_bdl_emerge \
-    break_dep_loop sys-apps/util-linux cryptsetup
+    break_dep_loop "${args_for_bdl[@]}" sys-apps/util-linux cryptsetup
     unset btt_bdl_portageq btt_bdl_equery btt_bdl_emerge
 
     # --root is required because run_merge overrides ROOT=

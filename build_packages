@@ -193,6 +193,7 @@ if [[ "${FLAGS_usepkgonly}" -eq "${FLAGS_FALSE}" ]]; then
   BDL_PORTAGEQ=portageq-"${BOARD}" \
   BDL_EQUERY=equery-"${BOARD}" \
   BDL_EMERGE=bp_bdl_emerge \
+  BDL_INFO=info \
   break_dep_loop sys-apps/util-linux udev,systemd,cryptsetup \
                  sys-fs/cryptsetup udev \
                  sys-fs/lvm2 udev,systemd \
