@@ -30,6 +30,9 @@ RUN rm -rf /mnt/host/source
 COPY --chown=sdk:sdk sdk_container/ /mnt/host/source
 COPY --chown=sdk:sdk . /mnt/host/source/src/scripts
 RUN chown sdk:sdk /mnt/host/source
+RUN ls -la /mnt/host/source/src/scripts/build_library
+RUN cat /mnt/host/source/src/scripts/build_library/break_dep_loop.sh
+RUN cat /mnt/host/source/src/scripts/build_library/catalyst_toolchains.sh
 
 COPY sdk_lib/90_env_keep /etc/sudoers.d/90_env_keep
 RUN chmod 0440 /etc/sudoers.d/90_env_keep
