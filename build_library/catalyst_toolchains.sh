@@ -44,7 +44,7 @@ build_target_toolchain() {
         ROOT=${ROOT} SYSROOT=${ROOT} PORTAGE_CONFIGROOT=${ROOT} equery "${@}"
     }
     function btt_bdl_emerge() {
-        PORTAGE_CONFIGROOT="$ROOT" run_merge -u --root="$ROOT" --sysroot="$ROOT" "${@}"
+        PORTAGE_CONFIGROOT="$ROOT" run_merge --root="$ROOT" --sysroot="$ROOT" "${@}"
     }
     # Breaking the following loops here:
     #
