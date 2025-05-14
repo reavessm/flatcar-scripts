@@ -48,8 +48,9 @@ build_target_toolchain() {
     }
     # Breaking the following loops here:
     #
-    # glibc[nscd] -> libcap[pam] -> sys-libs/pam -> libcrypt -> libxcrypt[system] -> libcap
+    # glibc[nscd] -> libcap[pam] -> sys-libs/pam -> libcrypt -> libxcrypt[system] -> glibc
     # glibc[nscd] -> audit[python] -> python -> libcrypt -> libxcrypt[system] -> glibc
+    # glibc[selinux] -> libselinux[python] -> python -> libcrypt -> libxcrypt[system] -> glibc
     # systemd[cryptsetup] -> cryptsetup[udev] -> libudev[systemd] -> systemd
     # systemd[cryptsetup] -> cryptsetup -> lvm2[udev] -> libudev[systemd] -> systemd
     # systemd[cryptsetup] -> cryptsetup -> lvm2[lvm,systemd] -> systemd
@@ -67,7 +68,7 @@ build_target_toolchain() {
     args_for_bdl+=(
         sys-apps/systemd cryptsetup,curl,importd,tpm
         sys-apps/util-linux audit,cryptsetup,pam,selinux,su,systemd,udev
-        sys-libs/glibc nscd
+        sys-libs/glibc nscd,selinux
     )
     BDL_ROOT=${ROOT} \
     BDL_PORTAGEQ=btt_bdl_portageq \
