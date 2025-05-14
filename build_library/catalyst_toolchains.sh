@@ -33,6 +33,10 @@ build_target_toolchain() {
     cp -at "${ROOT}" "${SYSROOT}"/lib*
     cp -at "${ROOT}"/usr "${SYSROOT}"/usr/include "${SYSROOT}"/usr/lib*
 
+    # install baselayout first, with the selinux profile, this seems
+    # to be pulled into the dependency chain now
+    PORTAGE_CONFIGROOT="$ROOT" run_merge --root="$ROOT" --sysroot="$ROOT" "${@}" sys-apps/baselayout
+
     local -a args_for_bdl=()
     if [[ -n ${clst_VERBOSE} ]]; then
         args_for_bdl+=(-v)
