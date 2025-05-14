@@ -35,7 +35,7 @@ build_target_toolchain() {
 
     # install baselayout first, with the selinux profile, this seems
     # to be pulled into the dependency chain now
-    PORTAGE_CONFIGROOT="$ROOT" run_merge --root="$ROOT" --sysroot="$ROOT" "${@}" sys-apps/baselayout
+    PORTAGE_CONFIGROOT="$ROOT" run_merge --root="$ROOT" --sysroot="$ROOT" --oneshot --nodeps sys-apps/baselayout
 
     local -a args_for_bdl=()
     if [[ -n ${clst_VERBOSE} ]]; then
