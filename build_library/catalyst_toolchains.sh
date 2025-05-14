@@ -48,19 +48,19 @@ build_target_toolchain() {
     }
     # Breaking the following loops here:
     #
-    # cryptsetup[udev] -> libudev[systemd] -> systemd[cryptsetup] -> cryptsetup
-    # lvm2[udev] -> libudev[systemd] -> systemd[cryptsetup] -> cryptsetup -> lvm2
-    #      systemd requires udev, so needs to be disabled too
-    # lvm2[lvm] -> systemd[cryptsetup] -> cryptsetup -> lvm2
-    #      thin requires lvm, so needs to be disabled too
+    # systemd[cryptsetup] -> cryptsetup[udev] -> libudev[systemd] -> systemd
+    # systemd[cryptsetup] -> cryptsetup -> lvm2[udev] -> libudev[systemd] -> systemd
+    # systemd[cryptsetup] -> cryptsetup -> lvm2[lvm,systemd] -> systemd
     # systemd[cryptsetup] -> cryptsetup -> tmpfiles[systemd] -> systemd
+    # systemd[curl] -> curl -> nghttp2[systemd] -> systemd
+    #     importd requires curl, so needs to be disabled too
     # util-linux[audit] -> audit[python] -> python -> util-linux
     # util-linux[cryptsetup] -> cryptsetup -> util-linux
     # util-linux[selinux] -> libselinux[python] -> python -> util-linux
     # util-linux[systemd] -> systemd -> util-linux
     # util-linux[udev] -> libudev[systemd] -> systemd -> util-linux
     args_for_bdl+=(
-        sys-apps/systemd cryptsetup
+        sys-apps/systemd cryptsetup,curl,importd
         sys-apps/util-linux audit,cryptsetup,selinux,systemd,udev
         #sys-fs/cryptsetup udev
         #sys-fs/lvm2 lvm,systemd,thin,udev
