@@ -21,16 +21,18 @@ break_dep_loop() {
     local bdl_equery=${BDL_EQUERY:-equery}
     local bdl_emerge=${BDL_EMERGE:-emerge}
     local bdl_info=${BDL_INFO:-echo}
-    local flag_file="${bdl_root%/}/etc/portage/package.use/break_dep_loop"
-
-    # Be sure to clean up use flag hackery from previous failed runs
-    sudo rm -f "${flag_file}"
+    local conf_dir="${bdl_root%/}/etc/portage"
+    local flag_file="${conf_dir}/package.use/break_dep_loop"
+    local force_flag_file="${conf_dir}/profile/package.use.force/break_dep_loop"
 
     local verbose=
     if [[ ${1:-} = '-v' ]]; then
         verbose=x
         shift
     fi
+
+    # Be sure to clean up use flag hackery from previous failed runs
+    sudo rm -f "${flag_file}" "${force_flag_file}"
 
     if [[ ${#} -eq 0 ]]; then
         return 0
@@ -117,8 +119,9 @@ break_dep_loop() {
     unset pkg any_flag_enabled equery_output flag flags_str flags grep_args
 
     "${bdl_info}" "Merging ${pkg_summaries[*]}"
-    sudo mkdir -p "${flag_file%/*}"
+    sudo mkdir -p "${flag_file%/*}" "${force_flag_file%/*}"
     printf '%s\n' "${flag_file_entries[@]}" | sudo tee "${flag_file}" >/dev/null
+    cp -a "${flag_file}" "${force_flag_file}"
     if [[ -n ${verbose} ]]; then
         "${bdl_info}" "contents of ${flag_file@Q}:"
         "${bdl_info}" "$(<"${flag_file}")"
@@ -129,6 +132,6 @@ break_dep_loop() {
     "${bdl_emerge}" \
          --rebuild-if-unbuilt=n \
          "${args[@]}" "${pkgs[@]}"
-    sudo rm -f "${flag_file}"
+    sudo rm -f "${flag_file}" "${force_flag_file}"
     unset bdl_call
 }
