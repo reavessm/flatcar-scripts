@@ -57,12 +57,14 @@ build_target_toolchain() {
     # systemd[tpm] -> tpm2-tss -> tmpfiles[systemd] -> systemd
     # util-linux[audit] -> audit[python] -> python -> util-linux
     # util-linux[cryptsetup] -> cryptsetup -> util-linux
+    # util-linux[pam] -> sys-libs/pam[audit] -> sys-process/audit[python] -> python -> util-linux
+    #     su requires pam, so needs to be disabled too
     # util-linux[selinux] -> libselinux[python] -> python -> util-linux
     # util-linux[systemd] -> systemd -> util-linux
     # util-linux[udev] -> libudev[systemd] -> systemd -> util-linux
     args_for_bdl+=(
         sys-apps/systemd cryptsetup,curl,importd,tpm
-        sys-apps/util-linux audit,cryptsetup,selinux,systemd,udev
+        sys-apps/util-linux audit,cryptsetup,pam,selinux,su,systemd,udev
     )
     BDL_ROOT=${ROOT} \
     BDL_PORTAGEQ=btt_bdl_portageq \
