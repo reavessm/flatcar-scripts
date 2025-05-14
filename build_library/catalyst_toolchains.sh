@@ -54,16 +54,15 @@ build_target_toolchain() {
     # systemd[cryptsetup] -> cryptsetup -> tmpfiles[systemd] -> systemd
     # systemd[curl] -> curl -> nghttp2[systemd] -> systemd
     #     importd requires curl, so needs to be disabled too
+    # systemd[tpm] -> tpm2-tss -> tmpfiles[systemd] -> systemd
     # util-linux[audit] -> audit[python] -> python -> util-linux
     # util-linux[cryptsetup] -> cryptsetup -> util-linux
     # util-linux[selinux] -> libselinux[python] -> python -> util-linux
     # util-linux[systemd] -> systemd -> util-linux
     # util-linux[udev] -> libudev[systemd] -> systemd -> util-linux
     args_for_bdl+=(
-        sys-apps/systemd cryptsetup,curl,importd
+        sys-apps/systemd cryptsetup,curl,importd,tpm
         sys-apps/util-linux audit,cryptsetup,selinux,systemd,udev
-        #sys-fs/cryptsetup udev
-        #sys-fs/lvm2 lvm,systemd,thin,udev
     )
     BDL_ROOT=${ROOT} \
     BDL_PORTAGEQ=btt_bdl_portageq \
