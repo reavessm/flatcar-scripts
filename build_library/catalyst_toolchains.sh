@@ -48,7 +48,11 @@ build_target_toolchain() {
     }
     # Breaking the following loops here:
     #
-    # cryptsetup[udev] -> libudev -> systemd -> cryptsetup
+    # cryptsetup[udev] -> libudev[systemd] -> systemd[cryptsetup] -> cryptsetup
+    # lvm2[udev] -> libudev[systemd] -> systemd[cryptsetup] -> cryptsetup -> lvm2
+    #      systemd requires udev, so needs to be disabled too
+    # lvm2[lvm] -> systemd[cryptsetup] -> cryptsetup -> lvm2
+    #      thin requires lvm, so needs to be disabled too
     # util-linux[audit] -> audit[python] -> python -> util-linux
     # util-linux[cryptsetup] -> cryptsetup -> util-linux
     # util-linux[selinux] -> libselinux[python] -> python -> util-linux
@@ -60,7 +64,8 @@ build_target_toolchain() {
     BDL_EMERGE=btt_bdl_emerge \
         break_dep_loop "${args_for_bdl[@]}" \
             sys-apps/util-linux audit,cryptsetup,selinux,systemd,udev \
-            sys-fs/cryptsetup udev
+            sys-fs/cryptsetup udev \
+            sys-fs/lvm2 lvm,systemd,thin,udev
     unset btt_bdl_portageq btt_bdl_equery btt_bdl_emerge
 
     # --root is required because run_merge overrides ROOT=
