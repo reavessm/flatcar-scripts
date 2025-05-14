@@ -51,12 +51,13 @@ build_target_toolchain() {
     # util-linux[cryptsetup] -> cryptsetup -> util-linux
     # util-linux[systemd] -> systemd -> util-linux
     # util-linux[audit] -> audit[python] -> python -> util-linux
+    # util-linux[selinux] -> libselinux[python] -> python -> util-linux
     BDL_ROOT=${ROOT} \
     BDL_PORTAGEQ=btt_bdl_portageq \
     BDL_EQUERY=btt_bdl_equery \
     BDL_EMERGE=btt_bdl_emerge \
         break_dep_loop "${args_for_bdl[@]}" \
-            sys-apps/util-linux cryptsetup,systemd,audit
+            sys-apps/util-linux audit,cryptsetup,selinux,systemd
     unset btt_bdl_portageq btt_bdl_equery btt_bdl_emerge
 
     # --root is required because run_merge overrides ROOT=
