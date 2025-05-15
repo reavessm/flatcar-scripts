@@ -29,16 +29,30 @@ build_target_toolchain() {
     local ROOT="/build/${board}"
     local SYSROOT="/usr/$(get_board_chost "${board}")"
 
-    mkdir -p "${ROOT}/usr"
-    cp -at "${ROOT}" "${SYSROOT}"/lib*
-    cp -at "${ROOT}"/usr "${SYSROOT}"/usr/include "${SYSROOT}"/usr/lib*
+    # install baselayout first, with the selinux profile, this seems
+    # to be pulled into the dependency chain now
+    PORTAGE_CONFIGROOT="$ROOT" run_merge --root="$ROOT" --sysroot="$ROOT" --oneshot --nodeps sys-apps/baselayout
 
-    # Add baselayout to package.provided - it is being pulled in by
-    # pambase and installing it coupled with above copying of stuff
-    # from SYSROOT to ROOT is messy.
-    local provided_file="${ROOT}/etc/portage/profile/package.provided/baselayout"
-    mkdir -p "${provided_file%/*}"
-    echo 'sys-apps/baselayout-3.6.8-r17' >"${provided_file}"
+    (
+        shopt -s nullglob
+        local d f
+        local -a files
+        for d in "${SYSROOT}"/lib* "${SYSROOT}"/usr/lib*; do
+            if [[ ! -d ${d} ]]; then
+                continue
+            fi
+            files=( "${d}"/* )
+            if [[ ${#files[@]} -gt 0 ]]; then
+                f=${d##*/}
+                cp -at "${ROOT}/usr/${f}" "${files[@]}"
+            fi
+        done
+    )
+    cp -at "${ROOT}"/usr "${SYSROOT}"/usr/include
+
+    echo ls -laR "${ROOT}"
+    ls -laR "${ROOT}"
+    exit 1
 
     local -a args_for_bdl=()
     if [[ -n ${clst_VERBOSE} ]]; then
@@ -87,7 +101,6 @@ build_target_toolchain() {
     # --root is required because run_merge overrides ROOT=
     PORTAGE_CONFIGROOT="$ROOT" \
         run_merge -u --root="$ROOT" --sysroot="$ROOT" "${TOOLCHAIN_PKGS[@]}"
-    rm "${ROOT}/etc/portage/profile/package.provided/baselayout"
 }
 
 configure_crossdev_overlay / /usr/local/portage/crossdev
