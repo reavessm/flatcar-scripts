@@ -50,10 +50,6 @@ build_target_toolchain() {
     )
     cp -at "${ROOT}"/usr "${SYSROOT}"/usr/include
 
-    echo ls -laR "${ROOT}"
-    ls -laR "${ROOT}"
-    exit 1
-
     local -a args_for_bdl=()
     if [[ -n ${clst_VERBOSE} ]]; then
         args_for_bdl+=(-v)
