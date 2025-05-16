@@ -29,10 +29,17 @@ build_target_toolchain() {
     local ROOT="/build/${board}"
     local SYSROOT="/usr/$(get_board_chost "${board}")"
 
-    # install baselayout first, with the selinux profile, this seems
-    # to be pulled into the dependency chain now
-    PORTAGE_CONFIGROOT="$ROOT" run_merge --root="$ROOT" --sysroot="$ROOT" --oneshot --nodeps sys-apps/baselayout
+    function btt_emerge() {
+        # --root is required because run_merge overrides ROOT=
+        PORTAGE_CONFIGROOT="$ROOT" run_merge --root="$ROOT" --sysroot="$ROOT" "${@}"
+    }
 
+    # install baselayout first - with the selinux profile, this is
+    # pulled into the dependency chain
+    btt_emerge --oneshot --nodeps sys-apps/baselayout
+
+    # copy libraries from sysroot to root - sysroot seems to be
+    # split-usr, whereas root does not, so take this into account
     (
         shopt -s nullglob
         local d f
@@ -59,9 +66,6 @@ build_target_toolchain() {
     }
     function btt_bdl_equery() {
         ROOT=${ROOT} SYSROOT=${ROOT} PORTAGE_CONFIGROOT=${ROOT} equery "${@}"
-    }
-    function btt_bdl_emerge() {
-        PORTAGE_CONFIGROOT="$ROOT" run_merge --root="$ROOT" --sysroot="$ROOT" "${@}"
     }
     # Breaking the following loops here:
     #
@@ -90,13 +94,12 @@ build_target_toolchain() {
     BDL_ROOT=${ROOT} \
     BDL_PORTAGEQ=btt_bdl_portageq \
     BDL_EQUERY=btt_bdl_equery \
-    BDL_EMERGE=btt_bdl_emerge \
+    BDL_EMERGE=btt_emerge \
         break_dep_loop "${args_for_bdl[@]}"
-    unset btt_bdl_portageq btt_bdl_equery btt_bdl_emerge
+    unset btt_bdl_portageq btt_bdl_equery
 
-    # --root is required because run_merge overrides ROOT=
-    PORTAGE_CONFIGROOT="$ROOT" \
-        run_merge -u --root="$ROOT" --sysroot="$ROOT" "${TOOLCHAIN_PKGS[@]}"
+    btt_emerge --changed_use --update --deep "${TOOLCHAIN_PKGS[@]}"
+    unset btt_emerge
 }
 
 configure_crossdev_overlay / /usr/local/portage/crossdev
