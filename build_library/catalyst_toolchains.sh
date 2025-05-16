@@ -98,7 +98,7 @@ build_target_toolchain() {
         break_dep_loop "${args_for_bdl[@]}"
     unset btt_bdl_portageq btt_bdl_equery
 
-    btt_emerge --changed_use --update --deep "${TOOLCHAIN_PKGS[@]}"
+    btt_emerge --changed-use --update --deep "${TOOLCHAIN_PKGS[@]}"
     unset btt_emerge
 }
 
