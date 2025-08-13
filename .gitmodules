@@ -1,0 +1,9 @@
+[submodule "sdk_container/src/third_party/gentoo"]
+	path = sdk_container/src/third_party/gentoo
+	url = https://github.com/gentoo/gentoo
+[submodule "sdk_container/src/third_party/handcar-overlay"]
+	path = sdk_container/src/third_party/handcar-overlay
+	url = https://gitlab.com/reavessm/handcar-overlay
+[submodule "sdk_container/src/third_party/guru"]
+	path = sdk_container/src/third_party/guru
+	url = https://github.com/gentoo/guru
